@@ -1,0 +1,853 @@
+<h1 id="section"></h1>
+&lt;!DOCTYPE html&gt;<br />
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+ScreenTime Dashboard
+</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"><br />
+
+<style>  
+  :root {  
+    --bg: #0a0a0f;  
+    --surface: #12121a;  
+    --border: #1e1e2e;  
+    --accent: #00ff88;  
+    --danger: #ff3b5c;  
+    --warn: #ffaa00;  
+    --text: #e8e8f0;  
+    --muted: #555570;  
+    --card: #14141f;  
+  }  
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }  
+  
+  body {  
+    background: var(--bg);  
+    color: var(--text);  
+    font-family: 'Syne', sans-serif;  
+    min-height: 100vh;  
+    padding: 24px 16px 48px;  
+    max-width: 520px;  
+    margin: 0 auto;  
+  }  
+  
+  /* Grain overlay */  
+  body::before {  
+    content: '';  
+    position: fixed;  
+    inset: 0;  
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");  
+    pointer-events: none;  
+    z-index: 0;  
+    opacity: 0.4;  
+  }  
+  
+  .header {  
+    display: flex;  
+    justify-content: space-between;  
+    align-items: flex-start;  
+    margin-bottom: 32px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .header-title {  
+    font-size: 11px;  
+    letter-spacing: 0.25em;  
+    text-transform: uppercase;  
+    color: var(--muted);  
+    margin-bottom: 4px;  
+  }  
+  
+  .header h1 {  
+    font-size: 28px;  
+    font-weight: 800;  
+    letter-spacing: -0.02em;  
+  }  
+  
+  .date-badge {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 11px;  
+    color: var(--muted);  
+    background: var(--surface);  
+    border: 1px solid var(--border);  
+    padding: 6px 12px;  
+    border-radius: 20px;  
+    white-space: nowrap;  
+  }  
+  
+  /* CONFIG SECTION */  
+  .config-section {  
+    background: var(--surface);  
+    border: 1px solid var(--border);  
+    border-radius: 16px;  
+    padding: 20px;  
+    margin-bottom: 20px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .config-section h3 {  
+    font-size: 11px;  
+    letter-spacing: 0.2em;  
+    text-transform: uppercase;  
+    color: var(--muted);  
+    margin-bottom: 16px;  
+  }  
+  
+  .config-row {  
+    display: flex;  
+    gap: 10px;  
+    align-items: center;  
+  }  
+  
+  .config-input {  
+    flex: 1;  
+    background: var(--bg);  
+    border: 1px solid var(--border);  
+    border-radius: 8px;  
+    padding: 10px 14px;  
+    color: var(--text);  
+    font-family: 'Space Mono', monospace;  
+    font-size: 11px;  
+    outline: none;  
+    transition: border-color 0.2s;  
+  }  
+  
+  .config-input:focus { border-color: var(--accent); }  
+  .config-input::placeholder { color: var(--muted); }  
+  
+  .btn {  
+    background: var(--accent);  
+    color: #000;  
+    border: none;  
+    border-radius: 8px;  
+    padding: 10px 18px;  
+    font-family: 'Syne', sans-serif;  
+    font-weight: 700;  
+    font-size: 13px;  
+    cursor: pointer;  
+    transition: opacity 0.2s, transform 0.1s;  
+    white-space: nowrap;  
+  }  
+  
+  .btn:hover { opacity: 0.85; }  
+  .btn:active { transform: scale(0.97); }  
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }  
+  
+  .btn-secondary {  
+    background: var(--surface);  
+    color: var(--text);  
+    border: 1px solid var(--border);  
+  }  
+  
+  /* STATUS BAR */  
+  .status-bar {  
+    display: flex;  
+    align-items: center;  
+    gap: 8px;  
+    font-family: 'Space Mono', monospace;  
+    font-size: 11px;  
+    color: var(--muted);  
+    margin-bottom: 24px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .status-dot {  
+    width: 7px;  
+    height: 7px;  
+    border-radius: 50%;  
+    background: var(--muted);  
+  }  
+  
+  .status-dot.ok { background: var(--accent); animation: pulse 2s infinite; }  
+  .status-dot.error { background: var(--danger); }  
+  
+  @keyframes pulse {  
+    0%, 100% { opacity: 1; }  
+    50% { opacity: 0.4; }  
+  }  
+  
+  /* SOLDE CARD */  
+  .solde-card {  
+    background: var(--card);  
+    border: 1px solid var(--border);  
+    border-radius: 20px;  
+    padding: 28px 24px;  
+    margin-bottom: 16px;  
+    position: relative;  
+    overflow: hidden;  
+    z-index: 1;  
+  }  
+  
+  .solde-card::after {  
+    content: '';  
+    position: absolute;  
+    top: -40px;  
+    right: -40px;  
+    width: 140px;  
+    height: 140px;  
+    border-radius: 50%;  
+    background: radial-gradient(circle, rgba(0,255,136,0.08) 0%, transparent 70%);  
+    pointer-events: none;  
+  }  
+  
+  .solde-card.danger::after {  
+    background: radial-gradient(circle, rgba(255,59,92,0.1) 0%, transparent 70%);  
+  }  
+  
+  .solde-label {  
+    font-size: 11px;  
+    letter-spacing: 0.2em;  
+    text-transform: uppercase;  
+    color: var(--muted);  
+    margin-bottom: 12px;  
+  }  
+  
+  .solde-value {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 48px;  
+    font-weight: 700;  
+    letter-spacing: -0.03em;  
+    color: var(--accent);  
+    line-height: 1;  
+    margin-bottom: 8px;  
+  }  
+  
+  .solde-value.danger { color: var(--danger); }  
+  .solde-value.warn { color: var(--warn); }  
+  
+  .solde-sub {  
+    font-size: 13px;  
+    color: var(--muted);  
+  }  
+  
+  /* PROGRESS BAR */  
+  .progress-wrap {  
+    background: var(--surface);  
+    border: 1px solid var(--border);  
+    border-radius: 16px;  
+    padding: 20px 24px;  
+    margin-bottom: 16px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .progress-header {  
+    display: flex;  
+    justify-content: space-between;  
+    align-items: center;  
+    margin-bottom: 14px;  
+  }  
+  
+  .progress-label {  
+    font-size: 12px;  
+    color: var(--muted);  
+    letter-spacing: 0.1em;  
+    text-transform: uppercase;  
+  }  
+  
+  .progress-nums {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 12px;  
+    color: var(--text);  
+  }  
+  
+  .progress-track {  
+    height: 6px;  
+    background: var(--border);  
+    border-radius: 10px;  
+    overflow: hidden;  
+  }  
+  
+  .progress-fill {  
+    height: 100%;  
+    border-radius: 10px;  
+    background: var(--accent);  
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);  
+  }  
+  
+  .progress-fill.danger { background: var(--danger); }  
+  .progress-fill.warn { background: var(--warn); }  
+  
+  /* GRID 2 COLS */  
+  .grid-2 {  
+    display: grid;  
+    grid-template-columns: 1fr 1fr;  
+    gap: 12px;  
+    margin-bottom: 16px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .stat-card {  
+    background: var(--card);  
+    border: 1px solid var(--border);  
+    border-radius: 16px;  
+    padding: 20px 16px;  
+  }  
+  
+  .stat-icon {  
+    font-size: 20px;  
+    margin-bottom: 10px;  
+  }  
+  
+  .stat-val {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 24px;  
+    font-weight: 700;  
+    color: var(--text);  
+    margin-bottom: 4px;  
+  }  
+  
+  .stat-label {  
+    font-size: 11px;  
+    color: var(--muted);  
+    letter-spacing: 0.05em;  
+  }  
+  
+  /* ALERT CARD */  
+  .alert-card {  
+    border-radius: 14px;  
+    padding: 16px 20px;  
+    margin-bottom: 16px;  
+    display: flex;  
+    align-items: flex-start;  
+    gap: 12px;  
+    position: relative;  
+    z-index: 1;  
+    display: none;  
+  }  
+  
+  .alert-card.danger {  
+    background: rgba(255, 59, 92, 0.08);  
+    border: 1px solid rgba(255, 59, 92, 0.3);  
+    display: flex;  
+  }  
+  
+  .alert-card.warn {  
+    background: rgba(255, 170, 0, 0.08);  
+    border: 1px solid rgba(255, 170, 0, 0.3);  
+    display: flex;  
+  }  
+  
+  .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }  
+  
+  .alert-text { font-size: 13px; line-height: 1.5; }  
+  .alert-text strong { display: block; margin-bottom: 2px; font-size: 14px; }  
+  
+  /* SECTION TITLE */  
+  .section-title {  
+    font-size: 11px;  
+    letter-spacing: 0.2em;  
+    text-transform: uppercase;  
+    color: var(--muted);  
+    margin-bottom: 12px;  
+    margin-top: 8px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  /* CHART */  
+  .chart-wrap {  
+    background: var(--card);  
+    border: 1px solid var(--border);  
+    border-radius: 20px;  
+    padding: 24px 20px 16px;  
+    margin-bottom: 16px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .chart-title {  
+    font-size: 13px;  
+    color: var(--muted);  
+    margin-bottom: 20px;  
+    letter-spacing: 0.05em;  
+  }  
+  
+  .chart-bars {  
+    display: flex;  
+    align-items: flex-end;  
+    gap: 6px;  
+    height: 100px;  
+  }  
+  
+  .bar-group {  
+    flex: 1;  
+    display: flex;  
+    flex-direction: column;  
+    align-items: center;  
+    gap: 4px;  
+    height: 100%;  
+  }  
+  
+  .bar-container {  
+    flex: 1;  
+    width: 100%;  
+    display: flex;  
+    flex-direction: column;  
+    justify-content: flex-end;  
+    gap: 2px;  
+  }  
+  
+  .bar {  
+    width: 100%;  
+    border-radius: 4px 4px 0 0;  
+    min-height: 2px;  
+    transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);  
+  }  
+  
+  .bar.earned { background: var(--accent); opacity: 0.8; }  
+  .bar.spent { background: var(--danger); opacity: 0.7; }  
+  
+  .bar-day {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 9px;  
+    color: var(--muted);  
+    text-align: center;  
+  }  
+  
+  .bar-day.today { color: var(--accent); }  
+  
+  /* CHART LEGEND */  
+  .chart-legend {  
+    display: flex;  
+    gap: 16px;  
+    margin-top: 14px;  
+  }  
+  
+  .legend-item {  
+    display: flex;  
+    align-items: center;  
+    gap: 6px;  
+    font-size: 11px;  
+    color: var(--muted);  
+  }  
+  
+  .legend-dot {  
+    width: 8px;  
+    height: 8px;  
+    border-radius: 2px;  
+  }  
+  
+  /* TASKS LIST */  
+  .tasks-list {  
+    background: var(--card);  
+    border: 1px solid var(--border);  
+    border-radius: 20px;  
+    overflow: hidden;  
+    margin-bottom: 16px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .task-row {  
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    padding: 14px 20px;  
+    border-bottom: 1px solid var(--border);  
+    transition: background 0.15s;  
+  }  
+  
+  .task-row:last-child { border-bottom: none; }  
+  .task-row:hover { background: rgba(255,255,255,0.02); }  
+  
+  .task-name {  
+    font-size: 13px;  
+    color: var(--text);  
+    flex: 1;  
+  }  
+  
+  .task-count {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 11px;  
+    color: var(--muted);  
+    margin-right: 12px;  
+  }  
+  
+  .task-reward {  
+    font-family: 'Space Mono', monospace;  
+    font-size: 12px;  
+    color: var(--accent);  
+    background: rgba(0, 255, 136, 0.08);  
+    padding: 3px 8px;  
+    border-radius: 6px;  
+  }  
+  
+  /* LOADING */  
+  .loading {  
+    text-align: center;  
+    padding: 60px 20px;  
+    color: var(--muted);  
+    font-family: 'Space Mono', monospace;  
+    font-size: 12px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+  
+  .loading::after {  
+    content: '';  
+    display: block;  
+    width: 24px;  
+    height: 24px;  
+    border: 2px solid var(--border);  
+    border-top-color: var(--accent);  
+    border-radius: 50%;  
+    margin: 16px auto 0;  
+    animation: spin 0.8s linear infinite;  
+  }  
+  
+  @keyframes spin { to { transform: rotate(360deg); } }  
+  
+  .hidden { display: none !important; }  
+  
+  /* FOOTER */  
+  .footer {  
+    text-align: center;  
+    font-size: 11px;  
+    color: var(--muted);  
+    font-family: 'Space Mono', monospace;  
+    margin-top: 32px;  
+    position: relative;  
+    z-index: 1;  
+  }  
+</style>
+</head>
+<body>
+<div class="header">
+<div>
+<pre><code>&lt;div class=&quot;header-title&quot;&gt;Screen Time&lt;/div&gt;  
+&lt;h1&gt;Dashboard&lt;/h1&gt;  </code></pre>
+</div>
+<div id="dateBadge" class="date-badge">
+—
+</div>
+</div>
+<!-- CONFIG -->
+<div class="config-section">
+<h3>
+⚙ Configuration
+</h3>
+<div class="config-row">
+<pre><code>&lt;input class=&quot;config-input&quot; id=&quot;scriptUrl&quot; placeholder=&quot;URL de ton Apps Script (/exec)&quot; /&gt;  
+&lt;button class=&quot;btn&quot; onclick=&quot;loadData()&quot;&gt;Charger&lt;/button&gt;  </code></pre>
+</div>
+<div style="margin-top: 10px;">
+<pre><code>&lt;button class=&quot;btn btn-secondary&quot; onclick=&quot;saveConfig()&quot; style=&quot;width:100%&quot;&gt;💾 Sauvegarder dans l&#39;URL (bookmark)&lt;/button&gt;  </code></pre>
+</div>
+<div
+style="margin-top: 8px; font-size: 11px; color: var(--muted); line-height: 1.6;">
+<pre><code>💡 Colle l&#39;URL de déploiement de ton Google Apps Script (celle qui finit par /exec)  </code></pre>
+</div>
+</div>
+<!-- STATUS -->
+<div class="status-bar">
+<div id="statusDot" class="status-dot">
+
+</div>
+<p><span id="statusText">En attente de configuration</span></p>
+</div>
+<!-- MAIN CONTENT -->
+<div id="mainContent" class="hidden">
+<!-- ALERT --><br />
+
+<div id="alertCard" class="alert-card">
+<pre><code>&lt;div class=&quot;alert-icon&quot; id=&quot;alertIcon&quot;&gt;&lt;/div&gt;  
+&lt;div class=&quot;alert-text&quot;&gt;  
+  &lt;strong id=&quot;alertTitle&quot;&gt;&lt;/strong&gt;  
+  &lt;span id=&quot;alertMsg&quot;&gt;&lt;/span&gt;  
+&lt;/div&gt;  </code></pre>
+</div>
+<!-- SOLDE --><br />
+
+<div id="soldeCard" class="solde-card">
+<pre><code>&lt;div class=&quot;solde-label&quot;&gt;Solde du jour&lt;/div&gt;  
+&lt;div class=&quot;solde-value&quot; id=&quot;soldeValue&quot;&gt;0 min&lt;/div&gt;  
+&lt;div class=&quot;solde-sub&quot; id=&quot;soldeSub&quot;&gt;&lt;/div&gt;  </code></pre>
+</div>
+<!-- PROGRESS BUDGET --><br />
+
+<div class="progress-wrap">
+<pre><code>&lt;div class=&quot;progress-header&quot;&gt;  
+  &lt;span class=&quot;progress-label&quot;&gt;Budget consommé&lt;/span&gt;  
+  &lt;span class=&quot;progress-nums&quot; id=&quot;budgetNums&quot;&gt;0 / 45 min&lt;/span&gt;  
+&lt;/div&gt;  
+&lt;div class=&quot;progress-track&quot;&gt;  
+  &lt;div class=&quot;progress-fill&quot; id=&quot;budgetBar&quot; style=&quot;width:0%&quot;&gt;&lt;/div&gt;  
+&lt;/div&gt;  </code></pre>
+</div>
+<!-- STATS GRID --><br />
+
+<div class="grid-2">
+<pre><code>&lt;div class=&quot;stat-card&quot;&gt;  
+  &lt;div class=&quot;stat-icon&quot;&gt;⚡&lt;/div&gt;  
+  &lt;div class=&quot;stat-val&quot; id=&quot;statEarned&quot;&gt;0&lt;/div&gt;  
+  &lt;div class=&quot;stat-label&quot;&gt;min gagnées&lt;/div&gt;  
+&lt;/div&gt;  
+&lt;div class=&quot;stat-card&quot;&gt;  
+  &lt;div class=&quot;stat-icon&quot;&gt;📱&lt;/div&gt;  
+  &lt;div class=&quot;stat-val&quot; id=&quot;statSpent&quot;&gt;0&lt;/div&gt;  
+  &lt;div class=&quot;stat-label&quot;&gt;min dépensées&lt;/div&gt;  
+&lt;/div&gt;  
+&lt;div class=&quot;stat-card&quot;&gt;  
+  &lt;div class=&quot;stat-icon&quot;&gt;✅&lt;/div&gt;  
+  &lt;div class=&quot;stat-val&quot; id=&quot;statTasks&quot;&gt;0&lt;/div&gt;  
+  &lt;div class=&quot;stat-label&quot;&gt;tâches aujourd&#39;hui&lt;/div&gt;  
+&lt;/div&gt;  
+&lt;div class=&quot;stat-card&quot;&gt;  
+  &lt;div class=&quot;stat-icon&quot;&gt;🔥&lt;/div&gt;  
+  &lt;div class=&quot;stat-val&quot; id=&quot;statStreak&quot;&gt;0&lt;/div&gt;  
+  &lt;div class=&quot;stat-label&quot;&gt;jours streak&lt;/div&gt;  
+&lt;/div&gt;  </code></pre>
+</div>
+<!-- CHART 7 JOURS --><br />
+
+<div class="chart-wrap">
+<pre><code>&lt;div class=&quot;chart-title&quot;&gt;7 DERNIERS JOURS&lt;/div&gt;  
+&lt;div class=&quot;chart-bars&quot; id=&quot;chartBars&quot;&gt;&lt;/div&gt;  
+&lt;div class=&quot;chart-legend&quot;&gt;  
+  &lt;div class=&quot;legend-item&quot;&gt;  
+    &lt;div class=&quot;legend-dot&quot; style=&quot;background: var(--accent)&quot;&gt;&lt;/div&gt;  
+    Temps gagné  
+  &lt;/div&gt;  
+  &lt;div class=&quot;legend-item&quot;&gt;  
+    &lt;div class=&quot;legend-dot&quot; style=&quot;background: var(--danger)&quot;&gt;&lt;/div&gt;  
+    Temps dépensé  
+  &lt;/div&gt;  
+&lt;/div&gt;  </code></pre>
+</div>
+<!-- TACHES DU JOUR --><br />
+
+<div class="section-title">
+Tâches accomplies aujourd’hui
+</div>
+<div id="tasksList" class="tasks-list">
+
+</div>
+</div>
+<div id="loadingEl" class="loading" style="display:none">
+Chargement des données…
+</div>
+<div class="footer">
+LogScreenTime v1.0 · Rechargé à <span id="lastUpdate">—</span>
+</div>
+<script>  
+const BUDGET = 45;  
+const SHEET_NAME = "Logs";  
+  
+// Config persistence via URL params (pas de localStorage)  
+function saveConfig() {  
+  const scriptUrl = document.getElementById('scriptUrl').value.trim();  
+  const url = new URL(window.location.href);  
+  if (scriptUrl) url.searchParams.set('script', encodeURIComponent(scriptUrl));  
+  window.history.replaceState({}, '', url);  
+  alert('Config sauvée ! Bookmark cette page pour y revenir directement.');  
+}  
+  
+function loadConfig() {  
+  const params = new URLSearchParams(window.location.search);  
+  if (params.get('script')) {  
+    document.getElementById('scriptUrl').value = decodeURIComponent(params.get('script'));  
+  }  
+}  
+  
+// Date helpers  
+function todayStr() {  
+  const d = new Date();  
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;  
+}  
+  
+function parseDate(str) {  
+  if (!str) return null;  
+  const parts = str.split('/');  
+  if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);  
+  return null;  
+}  
+  
+function dayLabel(d) {  
+  return ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()];  
+}  
+  
+async function loadData() {  
+  const scriptUrl = document.getElementById('scriptUrl').value.trim();  
+  if (!scriptUrl) {  
+    setStatus('error', 'URL Apps Script manquante');  
+    return;  
+  }  
+  
+  setStatus('loading', 'Chargement...');  
+  document.getElementById('loadingEl').style.display = 'block';  
+  document.getElementById('mainContent').classList.add('hidden');  
+  
+  try {  
+    const res = await fetch(scriptUrl);  
+    const json = await res.json();  
+    if (json.status !== 'ok') throw new Error(json.message || 'Erreur inconnue');  
+    renderDashboard(json.data);  
+    setStatus('ok', `${json.data.length} logs chargés`);  
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('fr');  
+  } catch(err) {  
+    setStatus('error', 'Erreur: ' + err.message);  
+    console.error(err);  
+  } finally {  
+    document.getElementById('loadingEl').style.display = 'none';  
+  }  
+}  
+  
+function renderDashboard(data) {  
+  const today = todayStr();  
+  
+  // Today's data  
+  const todayRows = data.filter(r => r.date === today);  
+  const earned = todayRows  
+    .filter(r => r.nomTask && r.nomTask !== 'Consommation temps' && r.nomTask.trim() !== '')  
+    .reduce((s, r) => s + (parseFloat(r.time) || 0), 0);  
+  const spent = todayRows  
+    .filter(r => r.nomTask === 'Consommation temps')  
+    .reduce((s, r) => s + (parseFloat(r.time) || 0), 0);  
+  
+  const solde = earned - spent;  
+  const tasksDone = todayRows.filter(r => r.nomTask && r.nomTask !== 'Consommation temps' && r.nomTask.trim() !== '').length;  
+  
+  // Solde card  
+  const soldeEl = document.getElementById('soldeValue');  
+  const soldeCard = document.getElementById('soldeCard');  
+  soldeEl.textContent = `${solde >= 0 ? '+' : ''}${solde} min`;  
+  soldeEl.className = 'solde-value' + (solde < 0 ? ' danger' : solde < 10 ? ' warn' : '');  
+  soldeCard.className = 'solde-card' + (solde < 0 ? ' danger' : '');  
+  document.getElementById('soldeSub').textContent = `${earned} gagnées · ${spent} dépensées`;  
+  
+  // Budget bar  
+  const pct = Math.min((spent / BUDGET) * 100, 100);  
+  const bar = document.getElementById('budgetBar');  
+  bar.style.width = pct + '%';  
+  bar.className = 'progress-fill' + (pct >= 100 ? ' danger' : pct >= 75 ? ' warn' : '');  
+  document.getElementById('budgetNums').textContent = `${spent} / ${BUDGET} min`;  
+  
+  // Stats  
+  document.getElementById('statEarned').textContent = earned;  
+  document.getElementById('statSpent').textContent = spent;  
+  document.getElementById('statTasks').textContent = tasksDone;  
+  
+  // Streak  
+  const allDates = [...new Set(data.map(r => r.date))].sort((a,b) => {  
+    return (parseDate(b)||0) - (parseDate(a)||0);  
+  });  
+  let streak = 0;  
+  let checkDate = new Date();  
+  for (let i = 0; i < 30; i++) {  
+    const ds = `${String(checkDate.getDate()).padStart(2,'0')}/${String(checkDate.getMonth()+1).padStart(2,'0')}/${checkDate.getFullYear()}`;  
+    const dayData = data.filter(r => r.date === ds);  
+    const dayTasks = dayData.filter(r => r.nomTask && r.nomTask !== 'Consommation temps' && r.nomTask.trim() !== '');  
+    if (dayTasks.length > 0) {  
+      streak++;  
+      checkDate.setDate(checkDate.getDate() - 1);  
+    } else {  
+      if (i === 0) { checkDate.setDate(checkDate.getDate() - 1); continue; }  
+      break;  
+    }  
+  }  
+  document.getElementById('statStreak').textContent = streak;  
+  
+  // Alert  
+  const alertCard = document.getElementById('alertCard');  
+  alertCard.className = 'alert-card';  
+  if (spent >= BUDGET) {  
+    alertCard.className = 'alert-card danger';  
+    document.getElementById('alertIcon').textContent = '🚨';  
+    document.getElementById('alertTitle').textContent = 'Budget dépassé !';  
+    document.getElementById('alertMsg').textContent = `Tu as consommé ${spent} min sur ${BUDGET} min de budget. Fais une tâche pour regagner du temps.`;  
+  } else if (spent >= BUDGET * 0.75) {  
+    alertCard.className = 'alert-card warn';  
+    document.getElementById('alertIcon').textContent = '⚠️';  
+    document.getElementById('alertTitle').textContent = 'Budget bientôt épuisé';  
+    document.getElementById('alertMsg').textContent = `Il te reste ${BUDGET - spent} min. Pense à accomplir une tâche pour recharger.`;  
+  }  
+  
+  // Chart 7 days  
+  const chartEl = document.getElementById('chartBars');  
+  chartEl.innerHTML = '';  
+  const days = [];  
+  for (let i = 6; i >= 0; i--) {  
+    const d = new Date();  
+    d.setDate(d.getDate() - i);  
+    const ds = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;  
+    const rows = data.filter(r => r.date === ds);  
+    const e = rows.filter(r => r.nomTask && r.nomTask !== 'Consommation temps' && r.nomTask.trim() !== '').reduce((s,r) => s + (parseFloat(r.time)||0), 0);  
+    const s = rows.filter(r => r.nomTask === 'Consommation temps').reduce((s,r) => s + (parseFloat(r.time)||0), 0);  
+    days.push({ date: d, label: dayLabel(d), earned: e, spent: s, isToday: i === 0 });  
+  }  
+  
+  const maxVal = Math.max(...days.map(d => Math.max(d.earned, d.spent)), 1);  
+  days.forEach(day => {  
+    const earnedH = Math.round((day.earned / maxVal) * 90);  
+    const spentH = Math.round((day.spent / maxVal) * 90);  
+    const group = document.createElement('div');  
+    group.className = 'bar-group';  
+    group.innerHTML = `  
+      <div class="bar-container">  
+        ${day.earned > 0 ? `<div class="bar earned" style="height:${earnedH}px"></div>` : ''}  
+        ${day.spent > 0 ? `<div class="bar spent" style="height:${spentH}px"></div>` : ''}  
+      </div>  
+      <div class="bar-day ${day.isToday ? 'today' : ''}">${day.label}</div>  
+    `;  
+    chartEl.appendChild(group);  
+  });  
+  
+  // Tasks today  
+  const taskCounts = {};  
+  const taskTimes = {};  
+  todayRows.filter(r => r.nomTask && r.nomTask !== 'Consommation temps' && r.nomTask.trim() !== '').forEach(r => {  
+    taskCounts[r.nomTask] = (taskCounts[r.nomTask] || 0) + 1;  
+    taskTimes[r.nomTask] = (taskTimes[r.nomTask] || 0) + (parseFloat(r.time) || 0);  
+  });  
+  
+  const listEl = document.getElementById('tasksList');  
+  listEl.innerHTML = '';  
+  if (Object.keys(taskCounts).length === 0) {  
+    listEl.innerHTML = '<div class="task-row"><div class="task-name" style="color:var(--muted)">Aucune tâche aujourd\'hui</div></div>';  
+  } else {  
+    Object.entries(taskCounts).sort((a,b) => b[1]-a[1]).forEach(([name, count]) => {  
+      const row = document.createElement('div');  
+      row.className = 'task-row';  
+      row.innerHTML = `  
+        <div class="task-name">${name.replace(/_/g, ' ')}</div>  
+        <div class="task-count">×${count}</div>  
+        <div class="task-reward">+${taskTimes[name]} min</div>  
+      `;  
+      listEl.appendChild(row);  
+    });  
+  }  
+  
+  document.getElementById('mainContent').classList.remove('hidden');  
+  
+  // Date badge  
+  const now = new Date();  
+  document.getElementById('dateBadge').textContent = now.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });  
+}  
+  
+function setStatus(type, msg) {  
+  const dot = document.getElementById('statusDot');  
+  const text = document.getElementById('statusText');  
+  dot.className = 'status-dot ' + (type === 'ok' ? 'ok' : type === 'error' ? 'error' : '');  
+  text.textContent = msg;  
+}  
+  
+// Auto-refresh toutes les 2 min  
+setInterval(() => {  
+  if (document.getElementById('scriptUrl').value) loadData();  
+}, 120000);  
+  
+// Init  
+loadConfig();  
+document.getElementById('dateBadge').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });  
+</script>
+</body>
+</html>
