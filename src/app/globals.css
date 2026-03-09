@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+
+html, body {
+  background: #0d0d1a;
+  color: #f0f0ff;
+  font-family: 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseDot {
+  0%,100% { box-shadow: 0 0 0 0 rgba(129,230,151,0.5); }
+  50%     { box-shadow: 0 0 0 6px rgba(129,230,151,0); }
+}
+
+.fade-up { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
+.s1 { animation-delay: 0.06s; opacity: 0; }
+.s2 { animation-delay: 0.12s; opacity: 0; }
+.s3 { animation-delay: 0.18s; opacity: 0; }
+.s4 { animation-delay: 0.24s; opacity: 0; }
+.s5 { animation-delay: 0.30s; opacity: 0; }
+.s6 { animation-delay: 0.36s; opacity: 0; }
+.pulse-dot { animation: pulseDot 2s ease infinite; }
+
+.glass {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.glass-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6ee7b7, #3b82f6);
+  color: white;
+  font-weight: 700;
+  border-radius: 14px;
+  padding: 14px 24px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: opacity 0.2s, transform 0.15s;
+  width: 100%;
+  font-family: 'Outfit', sans-serif;
+}
+.btn-primary:hover  { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+input.field {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 13px 16px;
+  color: #f0f0ff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input.field:focus { border-color: rgba(110,231,183,0.6); }
+input.field::placeholder { color: rgba(255,255,255,0.3); }
