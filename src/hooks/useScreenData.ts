@@ -100,18 +100,23 @@ export function useScreenData(scriptUrl: string | null) {
         .sort((a, b) => b.total - a.total)
 
       // Semaine
+      // Semaine Lun → Dim (7 derniers jours en commençant par le lundi le plus récent)
       const weekDays: DayStats[] = []
+      const todayDow = new Date().getDay() // 0=Dim, 1=Lun...
+      // Offset pour remonter au lundi de la semaine courante
+      const daysFromMonday = todayDow === 0 ? 6 : todayDow - 1
       for (let i = 6; i >= 0; i--) {
         const d  = new Date()
-        d.setDate(d.getDate() - i)
+        d.setDate(d.getDate() - daysFromMonday + (6 - i))
         const ds = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`
         const r  = rows.filter(x => x.date === ds)
+        const isToday = ds === today
         weekDays.push({
           label:   DAYS[d.getDay()],
           dateStr: ds,
           earned:  r.filter(isTask).reduce((s, x)  => s + x.time, 0),
           spent:   r.filter(isSpend).reduce((s, x) => s + x.time, 0),
-          isToday: i === 0,
+          isToday,
         })
       }
 

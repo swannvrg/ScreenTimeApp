@@ -16,11 +16,15 @@ export function WeekChart({ days }: { days: DayStats[] }) {
         <YAxis hide />
         <Tooltip
           contentStyle={{
-            background: 'rgba(15,15,30,0.95)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            borderRadius: 14, fontFamily: 'Outfit', fontSize: 12,
+            background: 'rgba(15,15,30,0.97)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: 14,
+            fontFamily: 'Outfit',
+            fontSize: 13,
+            color: '#f0f0ff',
           }}
-          labelStyle={{ color: '#f0f0ff', fontWeight: 600, marginBottom: 4 }}
+          labelStyle={{ color: '#f0f0ff', fontWeight: 700, marginBottom: 6 }}
+          itemStyle={{ color: '#f0f0ff' }}
           formatter={(value, name) => [`${value ?? 0} min`, name === 'earned' ? '⚡ Gagné' : '📱 Dépensé']}
         />
         <Bar dataKey="earned" radius={[6,6,0,0]}>
