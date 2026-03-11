@@ -119,65 +119,37 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* API Keys */}
-      <div className="fade-up s2 glass-card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>Clés API — Raccourcis iOS</p>
-        <p style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Génère une clé à coller dans ton raccourci iOS. Elle identifie ton compte automatiquement.</p>
+     {/* API Keys */}
+<div className="fade-up s2 glass-card" style={{ marginBottom: 16 }}>
+  <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>Clé API — Raccourcis iOS</p>
+  <p style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Clé générée automatiquement à la création du compte. Colle-la dans ton raccourci iOS.</p>
 
-        {/* Créer une clé */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-          <input
-            className="field"
-            value={newLabel}
-            onChange={e => setNewLabel(e.target.value)}
-            placeholder="Nom de la clé (ex: iPhone Swann)"
-            style={{ flex: 1 }}
-          />
-          <button
-            onClick={handleCreateKey}
-            disabled={creating || !newLabel.trim()}
-            style={{ background: 'linear-gradient(135deg, #6ee7b7, #3b82f6)', border: 'none', borderRadius: 12, padding: '0 16px', cursor: 'pointer', color: '#0d0d1a', fontWeight: 700, flexShrink: 0, opacity: !newLabel.trim() ? 0.4 : 1 }}
-          >
-            <Plus size={18} />
-          </button>
-        </div>
-
-        {/* Liste des clés */}
-        {keys.length === 0 ? (
-          <p style={{ fontSize: 13, color: C.muted, textAlign: 'center', padding: '12px 0' }}>Aucune clé générée</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {keys.map(k => (
-              <div key={k.key} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{k.label}</span>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => copyKey(k.key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied === k.key ? C.accent : C.muted, padding: 4 }}>
-                      {copied === k.key ? <Check size={15} /> : <Copy size={15} />}
-                    </button>
-                    <button onClick={() => handleDeleteKey(k.key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: C.danger, padding: 4 }}>
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </div>
-                <p style={{ fontSize: 11, fontFamily: 'monospace', color: C.accent, wordBreak: 'break-all', margin: 0 }}>{k.key}</p>
-                <p style={{ fontSize: 11, color: C.muted, margin: '6px 0 0' }}>Créée le {new Date(k.created_at).toLocaleDateString('fr-FR')}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Instructions raccourci */}
-        {keys.length > 0 && (
-          <div style={{ marginTop: 16, background: 'rgba(110,231,183,0.06)', border: '1px solid rgba(110,231,183,0.15)', borderRadius: 12, padding: '12px 14px' }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: C.accent, marginBottom: 8 }}>Dans ton raccourci iOS :</p>
-            <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• URL : <span style={{ color: C.text, fontFamily: 'monospace' }}>{process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('.supabase.co', '') ? `${process.env.NEXT_PUBLIC_APP_URL || 'https://ton-app.vercel.app'}/api/log` : '/api/log'}</span></p>
-            <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Method : <span style={{ color: C.text }}>POST</span></p>
-            <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Header : <span style={{ color: C.text, fontFamily: 'monospace' }}>x-api-key: ta_clé</span></p>
-            <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Body : <span style={{ color: C.text }}>JSON</span></p>
-          </div>
-        )}
+  {keys.length === 0 ? (
+    <p style={{ fontSize: 13, color: C.muted, textAlign: 'center', padding: '12px 0' }}>Aucune clé trouvée</p>
+  ) : (
+    <div style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 14px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>Ma clé iOS</span>
+        <button onClick={() => copyKey(keys[0].key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied === keys[0].key ? C.accent : C.muted, padding: 4 }}>
+          {copied === keys[0].key ? <Check size={15} /> : <Copy size={15} />}
+        </button>
       </div>
+      <p style={{ fontSize: 11, fontFamily: 'monospace', color: C.accent, wordBreak: 'break-all', margin: 0 }}>{keys[0].key}</p>
+      <p style={{ fontSize: 11, color: C.muted, margin: '6px 0 0' }}>Créée le {new Date(keys[0].created_at).toLocaleDateString('fr-FR')}</p>
+    </div>
+  )}
+
+  {/* Instructions raccourci */}
+  {keys.length > 0 && (
+    <div style={{ marginTop: 16, background: 'rgba(110,231,183,0.06)', border: '1px solid rgba(110,231,183,0.15)', borderRadius: 12, padding: '12px 14px' }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: C.accent, marginBottom: 8 }}>Dans ton raccourci iOS :</p>
+      <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• URL : <span style={{ color: C.text, fontFamily: 'monospace' }}>{process.env.NEXT_PUBLIC_APP_URL || 'https://ton-app.vercel.app'}/api/log</span></p>
+      <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Method : <span style={{ color: C.text }}>POST</span></p>
+      <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Header : <span style={{ color: C.text, fontFamily: 'monospace' }}>x-api-key: ta_clé</span></p>
+      <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Body : <span style={{ color: C.text }}>JSON</span></p>
+    </div>
+  )}
+</div>
 
       {/* Changer mot de passe */}
       <div className="fade-up s3 glass-card" style={{ marginBottom: 16 }}>
