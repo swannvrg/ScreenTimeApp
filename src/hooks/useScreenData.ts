@@ -2,9 +2,16 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { Log } from '@/lib/supabase'
 
-export type { Log }
+export interface LogRow {
+  id:       string
+  user_id:  string
+  date:     string
+  heure:    string
+  nom_task: string
+  time:     number
+  solde:    number
+}
 
 export interface DayStats {
   label:   string
@@ -22,8 +29,8 @@ export interface DashboardData {
   streak:     number
   todayTasks: { name: string; count: number; total: number }[]
   weekDays:   DayStats[]
-  recent:     Log[]
-  raw:        Log[]
+  recent:     LogRow[]
+  raw:        LogRow[]
 }
 
 const BUDGET       = 45
@@ -32,25 +39,21 @@ const DAYS         = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
 
 function pad(n: number) { return String(n).padStart(2, '0') }
 
-function todayISO() {
+function todayStr() {
   const d = new Date()
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
-function todayDisplay() {
-  const d = new Date()
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`
-}
+function isTask(r: LogRow)  { return r.nom_task && r.nom_task !== 'Consommation temps' && r.nom_task.trim() !== '' }
+function isSpend(r: LogRow) { return r.nom_task === 'Consommation temps' }
 
-function isTask(r: Log)  { return r.nom_task && r.nom_task !== 'Consommation temps' && r.nom_task.trim() !== '' }
-function isSpend(r: Log) { return r.nom_task === 'Consommation temps' }
-
-function computeStreak(data: Log[]): number {
+function computeStreak(data: LogRow[]): number {
   let streak = 0
   const check = new Date()
   for (let i = 0; i < 60; i++) {
-    const ds = `${check.getFullYear()}-${pad(check.getMonth() + 1)}-${pad(check.getDate())}`
-    if (data.filter(r => r.date === ds).filter(isTask).length > 0) streak++
+    const ds   = `${check.getFullYear()}-${pad(check.getMonth() + 1)}-${pad(check.getDate())}`
+    const rows = data.filter(r => r.date === ds)
+    if (rows.filter(isTask).length > 0) { streak++ }
     else if (i > 0) break
     check.setDate(check.getDate() - 1)
   }
@@ -68,32 +71,27 @@ export function useScreenData(userId: string | null) {
     setLoading(true)
     setError(null)
     try {
-      // Fetch tous les logs du user (30 derniers jours)
-      const since = new Date()
-      since.setDate(since.getDate() - 30)
-      const sinceISO = `${since.getFullYear()}-${pad(since.getMonth() + 1)}-${pad(since.getDate())}`
-
       const { data: rows, error: err } = await supabase
         .from('logs')
         .select('*')
         .eq('user_id', userId)
-        .gte('date', sinceISO)
+        // ✅ Trier par date ET heure pour garantir l'ordre chronologique
         .order('date', { ascending: true })
         .order('heure', { ascending: true })
 
       if (err) throw new Error(err.message)
 
-      const logs    = rows as Log[]
-      const todayIS = todayISO()
-      const todayRows = logs.filter(r => r.date === todayIS)
+      const allRows   = rows as LogRow[]
+      const today     = todayStr()
+      const todayRows = allRows.filter(r => r.date === today)
 
       const earned    = todayRows.filter(isTask).reduce((s, r)  => s + r.time, 0)
       const spent     = todayRows.filter(isSpend).reduce((s, r) => s + r.time, 0)
       const tasksDone = todayRows.filter(isTask).length
-      const lastRow   = todayRows.length > 0 ? todayRows[todayRows.length - 1] : null
-      const solde     = lastRow ? lastRow.solde : SOLDE_DEPART
 
-      // Tâches du jour groupées
+      // ✅ Solde recalculé dynamiquement côté front : SOLDE_DEPART + gagné - dépensé
+      const solde = SOLDE_DEPART + earned - spent
+
       const counts: Record<string, { count: number; total: number }> = {}
       todayRows.filter(isTask).forEach(r => {
         if (!counts[r.nom_task]) counts[r.nom_task] = { count: 0, total: 0 }
@@ -104,30 +102,31 @@ export function useScreenData(userId: string | null) {
         .map(([name, v]) => ({ name, ...v }))
         .sort((a, b) => b.total - a.total)
 
-      // Semaine Lun → Dim
       const weekDays: DayStats[] = []
-      const todayDow      = new Date().getDay()
+      const todayDow       = new Date().getDay()
       const daysFromMonday = todayDow === 0 ? 6 : todayDow - 1
-      for (let i = 0; i < 7; i++) {
-        const d = new Date()
-        d.setDate(d.getDate() - daysFromMonday + i)
+      for (let i = 6; i >= 0; i--) {
+        const d  = new Date()
+        d.setDate(d.getDate() - daysFromMonday + (6 - i))
         const ds = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-        const r  = logs.filter(x => x.date === ds)
+        const r  = allRows.filter(x => x.date === ds)
         weekDays.push({
           label:   DAYS[d.getDay()],
           dateStr: ds,
           earned:  r.filter(isTask).reduce((s, x)  => s + x.time, 0),
           spent:   r.filter(isSpend).reduce((s, x) => s + x.time, 0),
-          isToday: ds === todayIS,
+          isToday: ds === today,
         })
       }
 
       setData({
-        earned, spent, solde, tasksDone,
-        streak:    computeStreak(logs),
-        todayTasks, weekDays,
-        recent:    [...logs].reverse().slice(0, 40),
-        raw:       logs,
+        earned, spent, solde,
+        tasksDone,
+        streak:    computeStreak(allRows),
+        todayTasks,
+        weekDays,
+        recent:    [...allRows].reverse().slice(0, 40),
+        raw:       allRows,
       })
       setLastUpdate(new Date().toLocaleTimeString('fr'))
     } catch (e: unknown) {
