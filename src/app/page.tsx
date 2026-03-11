@@ -528,7 +528,7 @@ export default function DashboardPage() {
                       {dateDisplay}
                     </span>
                     <span style={{ fontSize: 12, color: C.muted }}>
-                      {r.heure}
+                      {r.heure.slice(0, 5)}
                     </span>
                     <span
                       style={{
