@@ -5,20 +5,24 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 
-export default function LoginPage() {
-  const { login, user } = useAuth()
+export default function RegisterPage() {
+  const { register, user } = useAuth()
   const router = useRouter()
-  const [email, setEmail]     = useState('')
-  const [password, setPass]   = useState('')
-  const [error, setError]     = useState('')
-  const [submitting, setSub]  = useState(false)
+  const [email, setEmail]       = useState('')
+  const [password, setPass]     = useState('')
+  const [confirm, setConfirm]   = useState('')
+  const [error, setError]       = useState('')
+  const [submitting, setSub]    = useState(false)
 
 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSub(true); setError('')
-    const { error } = await login(email, password)
+    setError('')
+    if (password !== confirm) { setError('Les mots de passe ne correspondent pas.'); return }
+    if (password.length < 6)  { setError('Le mot de passe doit faire au moins 6 caractères.'); return }
+    setSub(true)
+    const { error } = await register(email, password)
     if (error) { setError(error); setSub(false) }
   }
 
@@ -29,8 +33,8 @@ export default function LoginPage() {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '24px', fontFamily: "'Outfit', sans-serif",
     }}>
-      <div style={{ position: 'fixed', top: '15%', left: '10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(110,231,183,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'fixed', bottom: '15%', right: '10%', width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', top: '15%', right: '10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(110,231,183,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'fixed', bottom: '15%', left: '10%', width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
       <div className="fade-up" style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
 
@@ -45,7 +49,7 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="glass-card">
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0f0ff', marginBottom: 24 }}>Connexion</h2>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0f0ff', marginBottom: 24 }}>Créer un compte</h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
@@ -54,7 +58,17 @@ export default function LoginPage() {
             </div>
             <div>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Mot de passe</label>
-              <input className="field" type="password" value={password} onChange={e => setPass(e.target.value)} required placeholder="••••••••" />
+              <input className="field" type="password" value={password} onChange={e => setPass(e.target.value)} required placeholder="Min. 6 caractères" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Confirmer le mot de passe</label>
+              <input className="field" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required placeholder="••••••••" />
+              {/* Indicateur de correspondance */}
+              {confirm.length > 0 && (
+                <p style={{ fontSize: 12, marginTop: 6, color: password === confirm ? '#6ee7b7' : '#ff8fa3' }}>
+                  {password === confirm ? '✓ Les mots de passe correspondent' : '✗ Ne correspondent pas'}
+                </p>
+              )}
             </div>
 
             {error && (
@@ -63,15 +77,15 @@ export default function LoginPage() {
               </div>
             )}
 
-            <button className="btn-primary" type="submit" disabled={submitting} style={{ marginTop: 4 }}>
-              {submitting ? '...' : 'Se connecter →'}
+            <button className="btn-primary" type="submit" disabled={submitting || password !== confirm} style={{ marginTop: 4 }}>
+              {submitting ? '...' : 'Créer mon compte →'}
             </button>
           </form>
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>
-            Pas encore de compte ?{' '}
-            <Link href="/register" style={{ color: '#6ee7b7', fontWeight: 600, textDecoration: 'none' }}>
-              Créer un compte
+            Déjà un compte ?{' '}
+            <Link href="/login" style={{ color: '#6ee7b7', fontWeight: 600, textDecoration: 'none' }}>
+              Se connecter
             </Link>
           </div>
         </div>

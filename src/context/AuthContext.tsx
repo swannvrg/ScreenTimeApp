@@ -2,53 +2,63 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
+import type { User } from '@supabase/supabase-js'
 
 interface AuthContextType {
-  scriptUrl: string | null
-  isAuthenticated: boolean
-  login: (url: string, password: string) => boolean
-  logout: () => void
+  user:           User | null
+  authLoading:    boolean
+  login:          (email: string, password: string) => Promise<{ error: string | null }>
+  register:       (email: string, password: string) => Promise<{ error: string | null }>
+  logout:         () => Promise<void>
+  updatePassword: (newPassword: string) => Promise<{ error: string | null }>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [scriptUrl, setScriptUrl] = useState<string | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser]             = useState<User | null>(null)
+  const [authLoading, setAuthLoad]  = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('st_url')
-    const auth   = sessionStorage.getItem('st_auth')
-    if (stored && auth === '1') {
-      setScriptUrl(stored)
-      setIsAuthenticated(true)
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setAuthLoad(false)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
   }, [])
 
-  function login(url: string, password: string): boolean {
-    const secret = process.env.NEXT_PUBLIC_DASHBOARD_PASSWORD
-    if (!secret) {
-      console.error('NEXT_PUBLIC_DASHBOARD_PASSWORD non défini dans .env.local')
-      return false
-    }
-    if (password !== secret) return false
-    sessionStorage.setItem('st_url', url)
-    sessionStorage.setItem('st_auth', '1')
-    setScriptUrl(url)
-    setIsAuthenticated(true)
-    return true
+  async function login(email: string, password: string) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
+    router.replace('/')
+    return { error: null }
   }
 
-  function logout() {
-    sessionStorage.clear()
-    setScriptUrl(null)
-    setIsAuthenticated(false)
-    router.push('/login')
+  async function register(email: string, password: string) {
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) return { error: error.message }
+    router.replace('/')
+    return { error: null }
+  }
+
+  async function logout() {
+    await supabase.auth.signOut()
+    router.replace('/login')
+  }
+
+  async function updatePassword(newPassword: string) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) return { error: error.message }
+    return { error: null }
   }
 
   return (
-    <AuthContext.Provider value={{ scriptUrl, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, authLoading, login, register, logout, updatePassword }}>
       {children}
     </AuthContext.Provider>
   )
