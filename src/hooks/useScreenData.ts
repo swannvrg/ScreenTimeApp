@@ -46,15 +46,11 @@ function todayStr() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function isTask(r: LogRow) {
-  return (
-    r.nom_task &&
-    r.nom_task !== "Consommation temps" &&
-    r.nom_task.trim() !== ""
-  );
+function isTask(r: LogRow)  { 
+  return r.nom_task && r.nom_task.trim() !== 'Consommation temps' && r.nom_task.trim() !== '' 
 }
-function isSpend(r: LogRow) {
-  return r.nom_task === "Consommation temps";
+function isSpend(r: LogRow) { 
+  return r.nom_task.trim() === 'Consommation temps' 
 }
 
 function computeStreak(data: LogRow[]): number {

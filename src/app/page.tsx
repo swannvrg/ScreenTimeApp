@@ -506,7 +506,7 @@ export default function DashboardPage() {
               <p style={{ fontSize: 14, color: C.muted }}>Pas de données</p>
             ) : (
               data.recent.map((r, i) => {
-                const spend = r.nom_task === "Consommation temps";
+                const spend = r.nom_task.trim() === "Consommation temps";
                 const [y, m, d] = r.date.split("-");
                 const dateDisplay = `${d}/${m}/${y}`;
                 return (
