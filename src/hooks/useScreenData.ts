@@ -41,23 +41,28 @@ function pad(n: number) {
   return String(n).padStart(2, "0");
 }
 
+// Format DD/MM/YYYY
 function todayStr() {
   const d = new Date();
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 
-function isTask(r: LogRow)  { 
-  return r.nom_task && r.nom_task.trim() !== 'Consommation temps' && r.nom_task.trim() !== '' 
+function dateToStr(d: Date) {
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
-function isSpend(r: LogRow) { 
-  return r.nom_task.trim() === 'Consommation temps' 
+
+function isTask(r: LogRow) {
+  return r.nom_task && r.nom_task.trim() !== "Consommation temps" && r.nom_task.trim() !== "";
+}
+function isSpend(r: LogRow) {
+  return r.nom_task.trim() === "Consommation temps";
 }
 
 function computeStreak(data: LogRow[]): number {
   let streak = 0;
   const check = new Date();
   for (let i = 0; i < 60; i++) {
-    const ds = `${check.getFullYear()}-${pad(check.getMonth() + 1)}-${pad(check.getDate())}`;
+    const ds = dateToStr(check);
     const rows = data.filter((r) => r.date === ds);
     if (rows.filter(isTask).length > 0) {
       streak++;
@@ -82,7 +87,6 @@ export function useScreenData(userId: string | null) {
         .from("logs")
         .select("*")
         .eq("user_id", userId)
-        // ✅ Trier par date ET heure pour garantir l'ordre chronologique
         .order("date", { ascending: true })
         .order("heure", { ascending: true });
 
@@ -97,13 +101,8 @@ export function useScreenData(userId: string | null) {
       const tasksDone = todayRows.filter(isTask).length;
 
       const lastRow = allRows[allRows.length - 1];
-      const lastRowIsToday = lastRow?.date === today; // après parseDate
-
-      const solde = !lastRow
-        ? SOLDE_DEPART
-        : lastRowIsToday
-          ? lastRow.solde
-          : SOLDE_DEPART; 
+      const lastRowIsToday = lastRow?.date === today;
+      const solde = !lastRow ? SOLDE_DEPART : lastRowIsToday ? lastRow.solde : SOLDE_DEPART;
 
       const counts: Record<string, { count: number; total: number }> = {};
       todayRows.filter(isTask).forEach((r) => {
@@ -121,7 +120,7 @@ export function useScreenData(userId: string | null) {
       for (let i = 6; i >= 0; i--) {
         const d = new Date();
         d.setDate(d.getDate() - daysFromMonday + (6 - i));
-        const ds = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        const ds = dateToStr(d);
         const r = allRows.filter((x) => x.date === ds);
         weekDays.push({
           label: DAYS[d.getDay()],

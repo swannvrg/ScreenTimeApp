@@ -357,27 +357,10 @@ export default function DashboardPage() {
             marginBottom: 4,
           }}
         >
-          <StatTile
-            icon="⚡"
-            value={data?.earned ?? "—"}
-            label="min gagnées"
-            accent
-          />
-          <StatTile
-            icon="📱"
-            value={data?.spent ?? "—"}
-            label="min dépensées"
-          />
-          <StatTile
-            icon="✅"
-            value={data?.tasksDone ?? "—"}
-            label="tâches aujourd'hui"
-          />
-          <StatTile
-            icon="🔥"
-            value={data?.streak ?? "—"}
-            label="jours de streak"
-          />
+          <StatTile icon="⚡" value={data?.earned ?? "—"} label="min gagnées" accent />
+          <StatTile icon="📱" value={data?.spent ?? "—"} label="min dépensées" />
+          <StatTile icon="✅" value={data?.tasksDone ?? "—"} label="tâches aujourd'hui" />
+          <StatTile icon="🔥" value={data?.streak ?? "—"} label="jours de streak" />
         </div>
 
         {/* ── Chart ── */}
@@ -466,19 +449,10 @@ export default function DashboardPage() {
                         : "none",
                   }}
                 >
-                  <span
-                    style={{
-                      flex: 1,
-                      fontSize: 14,
-                      color: C.text,
-                      fontWeight: 500,
-                    }}
-                  >
+                  <span style={{ flex: 1, fontSize: 14, color: C.text, fontWeight: 500 }}>
                     {t.name.replace(/_/g, " ")}
                   </span>
-                  <span style={{ fontSize: 12, color: C.muted }}>
-                    ×{t.count}
-                  </span>
+                  <span style={{ fontSize: 12, color: C.muted }}>×{t.count}</span>
                   <span
                     style={{
                       fontSize: 13,
@@ -498,7 +472,6 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Historique ── */}
-        {/* ── Historique ── */}
         <SectionLabel>Historique récent</SectionLabel>
         <div className="fade-up s6">
           <Card>
@@ -507,8 +480,7 @@ export default function DashboardPage() {
             ) : (
               data.recent.map((r, i) => {
                 const spend = r.nom_task.trim() === "Consommation temps";
-                const [y, m, d] = r.date.split("-");
-                const dateDisplay = `${d}/${m}/${y}`;
+                // Date déjà en DD/MM/YYYY, affichage direct
                 return (
                   <div
                     key={r.id}
@@ -525,7 +497,7 @@ export default function DashboardPage() {
                     }}
                   >
                     <span style={{ fontSize: 12, color: C.muted }}>
-                      {dateDisplay}
+                      {r.date}
                     </span>
                     <span style={{ fontSize: 12, color: C.muted }}>
                       {r.heure.slice(0, 5)}
@@ -539,9 +511,8 @@ export default function DashboardPage() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {r.nom_task.replace(/_/g, " ")}
+                      {r.nom_task.trim().replace(/_/g, " ")}
                     </span>
-                    {/* ✅ Signe correct : - pour dépense, + pour tâche */}
                     <span
                       style={{
                         fontSize: 13,
