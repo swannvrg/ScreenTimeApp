@@ -41,12 +41,11 @@ export function SectionLabel({ children }: { children: ReactNode }) {
   )
 }
 
-export function StatTile({ icon, value, label, accent }: {
-  icon: string; value: string | number; label: string; accent?: boolean
+export function StatTile({  value, label, accent }: {
+ value: string | number; label: string; accent?: boolean
 }) {
   return (
     <Card style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <span style={{ fontSize: 24 }}>{icon}</span>
       <span style={{
         fontSize: 32, fontWeight: 800, lineHeight: 1,
         background: accent ? `linear-gradient(135deg, ${C.accent}, ${C.accentB})` : 'none',
