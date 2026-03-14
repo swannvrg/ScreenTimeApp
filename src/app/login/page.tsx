@@ -15,12 +15,17 @@ export default function LoginPage() {
 
 
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setSub(true); setError('')
-    const { error } = await login(email, password)
-    if (error) { setError(error); setSub(false) }
+ async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault()
+  setSub(true); setError('')
+  const { error } = await login(email, password)
+  if (error) { 
+    setError(error)
+    setSub(false)
+  } else {
+    router.replace('/')  
   }
+}
 
   return (
     <main style={{
