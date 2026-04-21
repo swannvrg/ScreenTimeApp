@@ -36,7 +36,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: 20, background: 'linear-gradient(135deg, #6ee7b7, #3b82f6)', marginBottom: 20, fontSize: 28 }}>📱</div>
+          
           <h1 style={{ fontSize: 36, fontWeight: 800, margin: 0, color: '#f0f0ff' }}>
             Screen<span style={{ background: 'linear-gradient(135deg, #6ee7b7, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Time</span>
           </h1>
