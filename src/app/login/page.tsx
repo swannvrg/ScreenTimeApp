@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 
+const DEMO_EMAIL = 'demo@demo.fr'
+const DEMO_PASSWORD = 'demo123'
+
 export default function LoginPage() {
-  const { login, user } = useAuth()
-  const router = useRouter()
+  const { login } = useAuth()
   const [email, setEmail]     = useState('')
   const [password, setPass]   = useState('')
   const [error, setError]     = useState('')
@@ -19,6 +20,14 @@ export default function LoginPage() {
     e.preventDefault()
     setSub(true); setError('')
     const { error } = await login(email, password)
+    if (error) { setError(error); setSub(false) }
+  }
+
+  async function handleDemoLogin() {
+    setSub(true); setError('')
+    setEmail(DEMO_EMAIL)
+    setPass(DEMO_PASSWORD)
+    const { error } = await login(DEMO_EMAIL, DEMO_PASSWORD)
     if (error) { setError(error); setSub(false) }
   }
 
@@ -66,6 +75,29 @@ export default function LoginPage() {
             <button className="btn-primary" type="submit" disabled={submitting} style={{ marginTop: 4 }}>
               {submitting ? '...' : 'Se connecter →'}
             </button>
+
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={submitting}
+              style={{
+                marginTop: 8,
+                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'rgba(255,255,255,0.06)',
+                color: '#f0f0ff',
+                borderRadius: 12,
+                height: 46,
+                fontWeight: 600,
+                cursor: submitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {submitting ? 'Connexion...' : 'Voir la demo'}
+            </button>
+
+            <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
+              Compte demo: {DEMO_EMAIL} / {DEMO_PASSWORD}
+            </p>
           </form>
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>

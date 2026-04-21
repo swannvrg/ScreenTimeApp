@@ -244,11 +244,11 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* ── Gestion des tâches ── */}
+      {/* ── Gestion des tâches ── 
       <div className="fade-up s3 glass-card" style={{ marginBottom: 16 }}>
         <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 20 }}>Tâches du menu</p>
 
-        {/* Liste des tâches existantes */}
+        
         {config && config.tasks.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
             {config.tasks.map(t => (
@@ -277,13 +277,13 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
-        )}
+        )}*/}
 
-        {/* Ajouter une tâche */}
+        {/* Ajouter une tâche 
         <div style={{ background: 'rgba(110,231,183,0.04)', border: '1px solid rgba(110,231,183,0.12)', borderRadius: 12, padding: '14px' }}>
           <p style={{ fontSize: 12, fontWeight: 600, color: C.accent, marginBottom: 12 }}>Ajouter une tâche</p>
 
-          {/* Sélecteur emoji */}
+          
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
             {EMOJI_OPTIONS.map(e => (
               <button key={e} onClick={() => setNewTask(prev => ({ ...prev, emoji: e }))}
@@ -318,9 +318,9 @@ export default function SettingsPage() {
             style={{ width: '100%', background: 'rgba(110,231,183,0.12)', border: '1px solid rgba(110,231,183,0.25)', borderRadius: 10, padding: '10px', color: C.accent, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: "'Outfit', sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: !newTask.label.trim() ? 0.4 : 1 }}>
             <Plus size={15} /> Ajouter
           </button>
-        </div>
+        </div>*/}
 
-        {/* Bouton sauvegarder */}
+        {/* Bouton sauvegarder 
         <button
           onClick={handleSaveConfig}
           disabled={savingConfig || !config}
@@ -330,9 +330,9 @@ export default function SettingsPage() {
         </button>
         {configOk  && <p style={{ fontSize: 13, color: C.accent, marginTop: 8, textAlign: 'center' }}>{configOk}</p>}
         {configErr && <p style={{ fontSize: 13, color: C.danger, marginTop: 8, textAlign: 'center' }}>{configErr}</p>}
-      </div>
+      </div>*/}
 
-      {/* API Keys */}
+      {/* API Keys 
       <div className="fade-up s4 glass-card" style={{ marginBottom: 16 }}>
         <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>Clé API — Raccourcis iOS</p>
         <p style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Colle cette clé dans ta PWA ou ton raccourci iOS.</p>
@@ -361,7 +361,7 @@ export default function SettingsPage() {
             <p style={{ fontSize: 12, color: C.muted, margin: '4px 0' }}>• Body : <span style={{ color: C.text, fontFamily: 'monospace' }}>{`{"nom_task": "Exos_pompes", "time": 5}`}</span></p>
           </div>
         )}
-      </div>
+      </div>*/}
 
       {/* Changer mot de passe */}
       <div className="fade-up s5 glass-card" style={{ marginBottom: 16 }}>
