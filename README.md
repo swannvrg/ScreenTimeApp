@@ -34,3 +34,65 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```
+screentime-app
+├─ eslint.config.mjs
+├─ generate_icons.mjs
+├─ next.config.ts
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.mjs
+├─ public
+│  ├─ file.svg
+│  ├─ globe.svg
+│  ├─ icons
+│  │  ├─ icon-192.png
+│  │  └─ icon-512.png
+│  ├─ manifest.json
+│  ├─ next.svg
+│  ├─ sw.js
+│  ├─ vercel.svg
+│  └─ window.svg
+├─ README.md
+├─ src
+│  ├─ app
+│  │  ├─ api
+│  │  │  ├─ config
+│  │  │  │  └─ route.ts
+│  │  │  └─ log
+│  │  │     └─ route.ts
+│  │  ├─ favicon.ico
+│  │  ├─ globals.css
+│  │  ├─ layout.tsx
+│  │  ├─ log
+│  │  │  └─ page.tsx
+│  │  ├─ login
+│  │  │  └─ page.tsx
+│  │  ├─ offline
+│  │  │  └─ page.tsx
+│  │  ├─ page.tsx
+│  │  ├─ providers.tsx
+│  │  ├─ register
+│  │  │  └─ page.tsx
+│  │  └─ settings
+│  │     └─ page.tsx
+│  ├─ components
+│  │  ├─ Budgetcard.tsx
+│  │  ├─ Dashboardheader.tsx
+│  │  ├─ Historiquerecent.tsx
+│  │  ├─ PeriodChart.tsx
+│  │  ├─ Soldecard.tsx
+│  │  ├─ Statsgrid.tsx
+│  │  ├─ Todaytasks.tsx
+│  │  └─ ui.tsx
+│  ├─ context
+│  │  └─ AuthContext.tsx
+│  ├─ hooks
+│  │  └─ useScreenData.ts
+│  └─ lib
+│     └─ supabase.ts
+├─ tailwind.config.ts
+└─ tsconfig.json
+
+```
