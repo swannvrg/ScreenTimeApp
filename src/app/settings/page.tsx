@@ -39,6 +39,7 @@ const EMOJI_OPTIONS = ['💪','💧','🛏️','📚','🎧','🍎','🏃','🧘
 export default function SettingsPage() {
   const { user, authLoading, logout, updatePassword } = useAuth()
   const router = useRouter()
+  const isDemoUser = user?.email?.toLowerCase() === 'demo@demo.fr'
 
   // Mot de passe
   const [newPass, setNewPass]     = useState('')
@@ -364,29 +365,31 @@ export default function SettingsPage() {
       </div>*/}
 
       {/* Changer mot de passe */}
-      <div className="fade-up s5 glass-card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 20 }}>Changer le mot de passe</p>
-        <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Nouveau mot de passe</label>
-            <input className="field" type="password" value={newPass} onChange={e => setNewPass(e.target.value)} required placeholder="Min. 6 caractères" />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Confirmer</label>
-            <input className="field" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required placeholder="••••••••" />
-            {confirm.length > 0 && (
-              <p style={{ fontSize: 12, marginTop: 6, color: newPass === confirm ? C.accent : C.danger }}>
-                {newPass === confirm ? '✓ Correspondent' : '✗ Ne correspondent pas'}
-              </p>
-            )}
-          </div>
-          {passError && <p style={{ fontSize: 13, color: C.danger }}>{passError}</p>}
-          {passOk    && <p style={{ fontSize: 13, color: C.accent }}>{passOk}</p>}
-          <button className="btn-primary" type="submit" disabled={savingPass || newPass !== confirm}>
-            {savingPass ? '...' : 'Mettre à jour →'}
-          </button>
-        </form>
-      </div>
+      {!isDemoUser && (
+        <div className="fade-up s5 glass-card" style={{ marginBottom: 16 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.muted, marginBottom: 20 }}>Changer le mot de passe</p>
+          <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Nouveau mot de passe</label>
+              <input className="field" type="password" value={newPass} onChange={e => setNewPass(e.target.value)} required placeholder="Min. 6 caractères" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Confirmer</label>
+              <input className="field" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required placeholder="••••••••" />
+              {confirm.length > 0 && (
+                <p style={{ fontSize: 12, marginTop: 6, color: newPass === confirm ? C.accent : C.danger }}>
+                  {newPass === confirm ? '✓ Correspondent' : '✗ Ne correspondent pas'}
+                </p>
+              )}
+            </div>
+            {passError && <p style={{ fontSize: 13, color: C.danger }}>{passError}</p>}
+            {passOk    && <p style={{ fontSize: 13, color: C.accent }}>{passOk}</p>}
+            <button className="btn-primary" type="submit" disabled={savingPass || newPass !== confirm}>
+              {savingPass ? '...' : 'Mettre à jour →'}
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Déconnexion */}
       <div className="fade-up s6 glass-card">

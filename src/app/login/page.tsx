@@ -14,8 +14,6 @@ export default function LoginPage() {
   const [error, setError]     = useState('')
   const [submitting, setSub]  = useState(false)
 
-
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSub(true); setError('')
@@ -25,8 +23,6 @@ export default function LoginPage() {
 
   async function handleDemoLogin() {
     setSub(true); setError('')
-    setEmail(DEMO_EMAIL)
-    setPass(DEMO_PASSWORD)
     const { error } = await login(DEMO_EMAIL, DEMO_PASSWORD)
     if (error) { setError(error); setSub(false) }
   }
@@ -41,71 +37,141 @@ export default function LoginPage() {
       <div style={{ position: 'fixed', top: '15%', left: '10%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(110,231,183,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
       <div style={{ position: 'fixed', bottom: '15%', right: '10%', width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-      <div className="fade-up" style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
-
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          
-          <h1 style={{ fontSize: 36, fontWeight: 800, margin: 0, color: '#f0f0ff' }}>
-            Screen<span style={{ background: 'linear-gradient(135deg, #6ee7b7, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Time</span>
-          </h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>Gamification Dashboard</p>
-        </div>
+      <div className="fade-up" style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
 
         {/* Card */}
-        <div className="glass-card">
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f0f0ff', marginBottom: 24 }}>Connexion</h2>
+        <div style={{
+          background: 'rgba(15,23,42,0.8)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 28,
+          padding: '48px 32px 40px',
+          backdropFilter: 'blur(20px)',
+          textAlign: 'center',
+        }}>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Email</label>
-              <input className="field" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="toi@email.com" />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>Mot de passe</label>
-              <input className="field" type="password" value={password} onChange={e => setPass(e.target.value)} required placeholder="••••••••" />
-            </div>
+          
+
+          {/* Title */}
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: '#f0f0ff', margin: '0 0 32px', lineHeight: 1.2 }}>
+            Connexion
+          </h1>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28 }}>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              placeholder="Email"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 14,
+                padding: '14px 16px',
+                color: '#f0f0ff',
+                fontSize: 15,
+                fontFamily: "'Outfit', sans-serif",
+                outline: 'none',
+                transition: 'background 0.2s',
+              }}
+              onFocus={e => e.target.style.background = 'rgba(255,255,255,0.12)'}
+              onBlur={e => e.target.style.background = 'rgba(255,255,255,0.08)'}
+            />
+
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPass(e.target.value)}
+              required
+              placeholder="Mot de passe"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: 14,
+                padding: '14px 16px',
+                color: '#f0f0ff',
+                fontSize: 15,
+                fontFamily: "'Outfit', sans-serif",
+                outline: 'none',
+                transition: 'background 0.2s',
+              }}
+              onFocus={e => e.target.style.background = 'rgba(255,255,255,0.12)'}
+              onBlur={e => e.target.style.background = 'rgba(255,255,255,0.08)'}
+            />
 
             {error && (
-              <div style={{ background: 'rgba(255,59,92,0.1)', border: '1px solid rgba(255,59,92,0.3)', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#ff8fa3' }}>
+              <div style={{ background: 'rgba(255,59,92,0.15)', border: '1px solid rgba(255,59,92,0.4)', borderRadius: 12, padding: '12px 14px', fontSize: 13, color: '#ff9fb6' }}>
                 {error}
               </div>
             )}
 
-            <button className="btn-primary" type="submit" disabled={submitting} style={{ marginTop: 4 }}>
-              {submitting ? '...' : 'Se connecter →'}
-            </button>
-
             <button
-              type="button"
-              onClick={handleDemoLogin}
+              type="submit"
               disabled={submitting}
               style={{
-                marginTop: 8,
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.06)',
-                color: '#f0f0ff',
-                borderRadius: 12,
-                height: 46,
-                fontWeight: 600,
+                background: 'linear-gradient(135deg, #00d4ff, #0089d9)',
+                border: 'none',
+                borderRadius: 14,
+                padding: '16px',
+                color: '#0d0d1a',
+                fontSize: 16,
+                fontWeight: 700,
                 cursor: submitting ? 'not-allowed' : 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'transform 0.15s ease, opacity 0.15s ease',
+                opacity: submitting ? 0.8 : 1,
               }}
+              onMouseDown={e => e.currentTarget.style.transform = 'scale(0.98)'}
+              onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
             >
-              {submitting ? 'Connexion...' : 'Voir la demo'}
+              {submitting ? 'Connexion...' : 'Se connecter'}
             </button>
-
-            <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
-              Compte demo: {DEMO_EMAIL} / {DEMO_PASSWORD}
-            </p>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: 'rgba(255,255,255,0.4)' }}>
-            Pas encore de compte ?{' '}
+          {/* Inscription link */}
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 24 }}>
+            Pas de compte ?{' '}
             <Link href="/register" style={{ color: '#6ee7b7', fontWeight: 600, textDecoration: 'none' }}>
-              Créer un compte
+              S'inscrire
             </Link>
           </div>
+
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>ou</span>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+          </div>
+
+          {/* Demo button */}
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={submitting}
+            style={{
+              width: '100%',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 14,
+              padding: '16px',
+              color: '#f0f0ff',
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              transition: 'background 0.2s, border-color 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.12)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+            }}
+          >
+            {submitting ? 'Connexion...' : 'Compte démo'}
+          </button>
+
         </div>
 
       </div>
